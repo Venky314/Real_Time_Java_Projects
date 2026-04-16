@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Enquiries - Counsellor Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <style>
+        body {
+            background: #f8f9fa;
+        }
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+        .filter-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        .btn-primary-custom {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            font-weight: 600;
+        }
+        .btn-primary-custom:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            transform: translateY(-2px);
+        }
+        .table thead th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+        }
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .status-new {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status-enrolled {
+            background: #cce5ff;
+            color: #004085;
+        }
+        .status-lost {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+        .btn-action {
+            padding: 4px 8px;
+            font-size: 0.8rem;
+            border-radius: 4px;
+        }
+        .table-container-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px 10px 0 0;
+            margin: -2rem -2rem 2rem -2rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" th:href="@{/dashboard}">
+                <i class="bi bi-building"></i> Counsellor Portal
+            </a>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text me-3">
+                    <i class="bi bi-person-circle"></i> <span th:text="${session.counsellorName}">Counsellor</span>
+                </span>
+                <a class="nav-link" th:href="@{/logout}">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="filter-container">
+            <h5 class="mb-3">
+                <i class="bi bi-funnel"></i> Filter Enquiries
+            </h5>
+            <form th:action="@{/filter-enqs}" th:object="${filterDto}" method="get">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label for="courseId" class="form-label">Course</label>
+                        <select class="form-select" id="courseId" th:field="*{courseId}">
+                            <option value="">All Courses</option>
+                            <option th:each="course : ${courses}" 
+                                    th:value="${course.courseId}" 
+                                    th:text="${course.courseName}"></option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="enqStatus" class="form-label">Status</label>
+                        <select class="form-select" id="enqStatus" th:field="*{enqStatus}">
+                            <option value="">All Status</option>
+                            <option value="New">New</option>
+                            <option value="Enrolled">Enrolled</option>
+                            <option value="Lost">Lost</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="classMode" class="form-label">Class Mode</label>
+                        <select class="form-select" id="classMode" th:field="*{classMode}">
+                            <option value="">All Modes</option>
+                            <option value="Online">Online</option>
+                            <option value="Classroom">Classroom</option>
+                            <option value="Hybrid">Hybrid</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary-custom">
+                            <i class="bi bi-search"></i> Apply Filters
+                        </button>
+                        <a th:href="@{/view-enqs}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-clockwise"></i> Reset
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="table-container">
+            <div class="table-container-header">
+                <h3 class="mb-1">
+                    <i class="bi bi-list-ul"></i> Student Enquiries
+                </h3>
+                <p class="mb-0 opacity-75">Manage and track all student enquiries</p>
+            </div>
+
+            <div class="mb-3">
+                <a th:href="@{/add-enq}" class="btn btn-primary-custom">
+                    <i class="bi bi-plus-circle"></i> Add New Enquiry
+                </a>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Student Name</th>
+                            <th>Phone</th>
+                            <th>Course</th>
+                            <th>Class Mode</th>
+                            <th>Status</th>
+                            <th>Created Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${#lists.isEmpty(enquiries)}">
+                            <td colspan="8" class="text-center text-muted">
+                                <i class="bi bi-inbox"></i> No enquiries found
+                            </td>
+                        </tr>
+                        <tr th:each="enq : ${enquiries}">
+                            <td th:text="${enq.enqId}"></td>
+                            <td th:text="${enq.stuName}"></td>
+                            <td th:text="${enq.stuPhno}"></td>
+                            <td th:text="${enq.courseId}"></td>
+                            <td th:text="${enq.classMode}"></td>
+                            <td>
+                                <span class="status-badge" 
+                                      th:classappend="${'status-' + #strings.toLowerCase(enq.enqStatus)}"
+                                      th:text="${enq.enqStatus}"></span>
+                            </td>
+                            <td th:text="${#temporals.format(enq.createdDate, 'dd-MM-yyyy')}"></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a th:href="@{'/edit-enq/' + ${enq.enqId}}" 
+                                       class="btn btn-sm btn-outline-primary btn-action">
+                                        <i class="bi bi-pencil"></i> Edit
+                                    </a>
+                                    <button class="btn btn-sm btn-outline-danger btn-action" 
+                                            th:onclick="'deleteEnquiry(' + ${enq.enqId} + ')'">
+                                        <i class="bi bi-trash"></i> Delete
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-3">
+                <a th:href="@{/dashboard}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function deleteEnquiry(enqId) {
+            if (confirm('Are you sure you want to delete this enquiry?')) {
+                // Add delete functionality if needed
+                console.log('Delete enquiry:', enqId);
+            }
+        }
+    </script>
+</body>
+</html>

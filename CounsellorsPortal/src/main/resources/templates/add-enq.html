@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Enquiry - Counsellor Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <style>
+        body {
+            background: #f8f9fa;
+        }
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .form-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        .btn-primary-custom {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 12px 30px;
+            font-weight: 600;
+        }
+        .btn-primary-custom:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            transform: translateY(-2px);
+        }
+        .btn-secondary-custom {
+            background: #6c757d;
+            border: none;
+            padding: 12px 30px;
+            font-weight: 600;
+        }
+        .form-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px 10px 0 0;
+            margin: -2rem -2rem 2rem -2rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" th:href="@{/dashboard}">
+                <i class="bi bi-building"></i> Counsellor Portal
+            </a>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text me-3">
+                    <i class="bi bi-person-circle"></i> <span th:text="${session.counsellorName}">Counsellor</span>
+                </span>
+                <a class="nav-link" th:href="@{/logout}">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="form-container">
+            <div class="form-header">
+                <h3 class="mb-1">
+                    <i class="bi bi-plus-circle"></i> 
+                    <span th:if="${enq.enqId == null}">Add New Enquiry</span>
+                    <span th:if="${enq.enqId != null}">Update Enquiry</span>
+                </h3>
+                <p class="mb-0 opacity-75">Enter student enquiry details</p>
+            </div>
+
+            <div th:if="${smsg}" class="alert alert-success" th:text="${smsg}"></div>
+            <div th:if="${emsg}" class="alert alert-danger" th:text="${emsg}"></div>
+
+            <form th:action="@{/add-enq}" th:if="${enq.enqId == null}" th:object="${enq}" method="post">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="stuName" class="form-label">Student Name *</label>
+                        <input type="text" class="form-control" id="stuName" th:field="*{stuName}" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="stuPhno" class="form-label">Phone Number *</label>
+                        <input type="tel" class="form-control" id="stuPhno" th:field="*{stuPhno}" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="courseId" class="form-label">Course *</label>
+                        <select class="form-select" id="courseId" th:field="*{courseId}" required>
+                            <option value="">Select Course</option>
+                            <option th:each="course : ${courses}" 
+                                    th:value="${course.courseId}" 
+                                    th:text="${course.courseName}"></option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="classMode" class="form-label">Class Mode *</label>
+                        <select class="form-select" id="classMode" th:field="*{classMode}" required>
+                            <option value="">Select Mode</option>
+                            <option value="Online">Online</option>
+                            <option value="Classroom">Classroom</option>
+                            <option value="Hybrid">Hybrid</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary-custom">
+                        <i class="bi bi-save"></i> Add Enquiry
+                    </button>
+                    <a th:href="@{/dashboard}" class="btn btn-secondary-custom">
+                        <i class="bi bi-arrow-left"></i> Back to Dashboard
+                    </a>
+                </div>
+            </form>
+
+            <form th:action="@{/update-enq}" th:if="${enq.enqId != null}" th:object="${enq}" method="post">
+                <input type="hidden" th:field="*{enqId}">
+                <input type="hidden" th:field="*{counsellorId}">
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="stuName" class="form-label">Student Name *</label>
+                        <input type="text" class="form-control" id="stuName" th:field="*{stuName}" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="stuPhno" class="form-label">Phone Number *</label>
+                        <input type="tel" class="form-control" id="stuPhno" th:field="*{stuPhno}" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="courseId" class="form-label">Course *</label>
+                        <select class="form-select" id="courseId" th:field="*{courseId}" required>
+                            <option value="">Select Course</option>
+                            <option th:each="course : ${courses}" 
+                                    th:value="${course.courseId}" 
+                                    th:text="${course.courseName}"></option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="classMode" class="form-label">Class Mode *</label>
+                        <select class="form-select" id="classMode" th:field="*{classMode}" required>
+                            <option value="">Select Mode</option>
+                            <option value="Online">Online</option>
+                            <option value="Classroom">Classroom</option>
+                            <option value="Hybrid">Hybrid</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="enqStatus" class="form-label">Enquiry Status *</label>
+                        <select class="form-select" id="enqStatus" th:field="*{enqStatus}" required>
+                            <option value="">Select Status</option>
+                            <option value="New">New</option>
+                            <option value="Enrolled">Enrolled</option>
+                            <option value="Lost">Lost</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary-custom">
+                        <i class="bi bi-save"></i> Update Enquiry
+                    </button>
+                    <a th:href="@{/view-enqs}" class="btn btn-secondary-custom">
+                        <i class="bi bi-arrow-left"></i> Back to Enquiries
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
