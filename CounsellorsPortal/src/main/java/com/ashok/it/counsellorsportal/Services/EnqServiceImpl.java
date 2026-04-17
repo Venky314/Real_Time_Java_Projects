@@ -47,12 +47,21 @@ public class EnqServiceImpl implements EnqService {
         String enqStatus = reqDto.getEnqStatus();
         String classMode = reqDto.getClassMode();
         
+        System.out.println("Service - Filter Parameters:");
+        System.out.println("Course ID: " + courseId);
+        System.out.println("Enq Status: '" + enqStatus + "'");
+        System.out.println("Class Mode: '" + classMode + "'");
+        
         if (courseId == null && (enqStatus == null || enqStatus.isEmpty()) 
             && (classMode == null || classMode.isEmpty())) {
+            System.out.println("All filters are empty, returning all enquiries");
             return getAllEnquiries(counsellorId);
         }
         
+        System.out.println("Applying filters with database query");
         List<Enquiry> enquiries = enquiryRepo.findByFilters(counsellorId, courseId, enqStatus, classMode);
+        System.out.println("Database returned " + enquiries.size() + " enquiries");
+        
         // Populate course names
         for (Enquiry enq : enquiries) {
             if (enq.getCourseId() != null) {

@@ -1,0 +1,6 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<option th:each="city : ${cities}" 
+        th:value="${city.cityId}" 
+        th:text="${city.cityName}"></option>
+</html>

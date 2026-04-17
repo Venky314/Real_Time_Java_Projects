@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Dropdowns Test - User Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px 0;
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .card-header {
+            border-radius: 15px 15px 0 0 !important;
+            font-weight: 600;
+            padding: 1.2rem;
+        }
+
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        .btn {
+            border-radius: 10px;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #28a745, #20c997);
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(45deg, #218838, #1ea085);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .alert {
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Loading state for dropdowns */
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        /* Debug info */
+        .debug-info {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            font-family: monospace;
+            font-size: 0.875rem;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-success { background-color: #28a745; }
+        .status-error { background-color: #dc3545; }
+        .status-loading { background-color: #ffc107; animation: pulse 1s infinite; }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="card mt-5 shadow">
+                    <div class="card-header bg-success text-white text-center">
+                        <h4 class="mb-0">Dynamic Dropdowns Test</h4>
+                    </div>
+                    <div class="card-body">
+                        <!-- Success/Error Messages -->
+                        <div id="message-container"></div>
+                        
+                        <form id="registrationForm">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="userName" class="form-label">Name</label>
+                                    <input type="text" class="form-control" id="userName" 
+                                           placeholder="Enter your name" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" 
+                                           placeholder="Enter your email" required>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="phoneNumber" class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control" id="phoneNumber" 
+                                           placeholder="Enter your phone number" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="country" class="form-label">
+                                        Country 
+                                        <span class="status-indicator" id="country-status"></span>
+                                    </label>
+                                    <select class="form-select" id="country" required>
+                                        <option value="">Loading countries...</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="state" class="form-label">
+                                        State 
+                                        <span class="status-indicator" id="state-status"></span>
+                                    </label>
+                                    <select class="form-select" id="state" required disabled>
+                                        <option value="">Select State</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="city" class="form-label">
+                                        City 
+                                        <span class="status-indicator" id="city-status"></span>
+                                    </label>
+                                    <select class="form-select" id="city" required disabled>
+                                        <option value="">Select City</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-success">Register</button>
+                            </div>
+                        </form>
+                        
+                        <!-- Debug Information -->
+                        <div class="debug-info">
+                            <h6>Debug Information</h6>
+                            <div id="debug-log">
+                                <div>Initializing dropdowns...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Dynamic Dropdowns JavaScript
+        document.addEventListener('DOMContentLoaded', function() {
+            const countrySelect = document.getElementById('country');
+            const stateSelect = document.getElementById('state');
+            const citySelect = document.getElementById('city');
+            const debugLog = document.getElementById('debug-log');
+            
+            // Debug logging function
+            function log(message, type = 'info') {
+                const timestamp = new Date().toLocaleTimeString();
+                const logEntry = document.createElement('div');
+                logEntry.innerHTML = `<span class="text-muted">[${timestamp}]</span> ${message}`;
+                debugLog.appendChild(logEntry);
+                debugLog.scrollTop = debugLog.scrollHeight;
+                console.log(`[${timestamp}] ${message}`);
+            }
+            
+            // Update status indicator
+            function updateStatus(elementId, status) {
+                const indicator = document.getElementById(`${elementId}-status`);
+                if (indicator) {
+                    indicator.className = `status-indicator status-${status}`;
+                }
+            }
+            
+            // Show message
+            function showMessage(message, type = 'info') {
+                const container = document.getElementById('message-container');
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+                alertDiv.innerHTML = `
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                container.innerHTML = '';
+                container.appendChild(alertDiv);
+                
+                // Auto dismiss after 5 seconds
+                setTimeout(() => {
+                    if (alertDiv.parentNode) {
+                        alertDiv.remove();
+                    }
+                }, 5000);
+            }
+            
+            // Load countries on page load
+            loadCountries();
+            
+            // Country change event
+            countrySelect.addEventListener('change', function() {
+                const countryId = this.value;
+                log(`Country changed to: ${countryId} (${this.options[this.selectedIndex].text})`);
+                
+                // Reset state and city dropdowns
+                resetDropdown(stateSelect, 'Select State');
+                resetDropdown(citySelect, 'Select City');
+                stateSelect.disabled = true;
+                citySelect.disabled = true;
+                updateStatus('state', '');
+                updateStatus('city', '');
+                
+                if (countryId) {
+                    loadStates(countryId);
+                }
+            });
+            
+            // State change event
+            stateSelect.addEventListener('change', function() {
+                const stateId = this.value;
+                log(`State changed to: ${stateId} (${this.options[this.selectedIndex].text})`);
+                
+                // Reset city dropdown
+                resetDropdown(citySelect, 'Select City');
+                citySelect.disabled = true;
+                updateStatus('city', '');
+                
+                if (stateId) {
+                    loadCities(stateId);
+                }
+            });
+            
+            // Load countries from API
+            function loadCountries() {
+                log('Loading countries...');
+                updateStatus('country', 'loading');
+                
+                fetch('/api/users/countries')
+                    .then(response => {
+                        log(`Countries API response status: ${response.status}`);
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        log('Countries data received: ' + JSON.stringify(data, null, 2));
+                        countrySelect.innerHTML = '<option value="">Select Country</option>';
+                        
+                        if (data.status === "SUCCESS" && data.data && Array.isArray(data.data)) {
+                            data.data.forEach(country => {
+                                const option = document.createElement('option');
+                                option.value = country.countryId;
+                                option.textContent = country.countryName;
+                                countrySelect.appendChild(option);
+                            });
+                            log(`Loaded ${data.data.length} countries`);
+                            updateStatus('country', 'success');
+                            showMessage('Countries loaded successfully!', 'success');
+                        } else {
+                            log('Invalid countries data format', 'error');
+                            countrySelect.innerHTML = '<option value="">Error loading countries</option>';
+                            updateStatus('country', 'error');
+                            showMessage('Invalid countries data format', 'danger');
+                        }
+                        
+                        countrySelect.disabled = false;
+                    })
+                    .catch(error => {
+                        log('Error loading countries: ' + error.message, 'error');
+                        countrySelect.innerHTML = '<option value="">Error loading countries</option>';
+                        updateStatus('country', 'error');
+                        showMessage('Failed to load countries: ' + error.message, 'danger');
+                    });
+            }
+            
+            // Load states based on country selection
+            function loadStates(countryId) {
+                log(`Loading states for country ID: ${countryId}`);
+                updateStatus('state', 'loading');
+                
+                fetch(`/api/users/states/${countryId}`)
+                    .then(response => {
+                        log(`States API response status: ${response.status}`);
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        log('States data received: ' + JSON.stringify(data, null, 2));
+                        stateSelect.innerHTML = '<option value="">Select State</option>';
+                        
+                        if (data.status === "SUCCESS" && data.data && Array.isArray(data.data)) {
+                            data.data.forEach(state => {
+                                const option = document.createElement('option');
+                                option.value = state.stateId;
+                                option.textContent = state.stateName;
+                                stateSelect.appendChild(option);
+                            });
+                            log(`Loaded ${data.data.length} states`);
+                            updateStatus('state', 'success');
+                        } else {
+                            log('Invalid states data format', 'error');
+                            stateSelect.innerHTML = '<option value="">No states available</option>';
+                            updateStatus('state', 'error');
+                        }
+                        
+                        stateSelect.disabled = false;
+                    })
+                    .catch(error => {
+                        log('Error loading states: ' + error.message, 'error');
+                        stateSelect.innerHTML = '<option value="">Error loading states</option>';
+                        updateStatus('state', 'error');
+                        showMessage('Failed to load states: ' + error.message, 'danger');
+                    });
+            }
+            
+            // Load cities based on state selection
+            function loadCities(stateId) {
+                log(`Loading cities for state ID: ${stateId}`);
+                updateStatus('city', 'loading');
+                
+                fetch(`/api/users/cities/${stateId}`)
+                    .then(response => {
+                        log(`Cities API response status: ${response.status}`);
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        log('Cities data received: ' + JSON.stringify(data, null, 2));
+                        citySelect.innerHTML = '<option value="">Select City</option>';
+                        
+                        if (data.status === "SUCCESS" && data.data && Array.isArray(data.data)) {
+                            data.data.forEach(city => {
+                                const option = document.createElement('option');
+                                option.value = city.cityId;
+                                option.textContent = city.cityName;
+                                citySelect.appendChild(option);
+                            });
+                            log(`Loaded ${data.data.length} cities`);
+                            updateStatus('city', 'success');
+                        } else {
+                            log('Invalid cities data format', 'error');
+                            citySelect.innerHTML = '<option value="">No cities available</option>';
+                            updateStatus('city', 'error');
+                        }
+                        
+                        citySelect.disabled = false;
+                    })
+                    .catch(error => {
+                        log('Error loading cities: ' + error.message, 'error');
+                        citySelect.innerHTML = '<option value="">Error loading cities</option>';
+                        updateStatus('city', 'error');
+                        showMessage('Failed to load cities: ' + error.message, 'danger');
+                    });
+            }
+            
+            // Reset dropdown to default state
+            function resetDropdown(selectElement, defaultText) {
+                selectElement.innerHTML = `<option value="">${defaultText}</option>`;
+                selectElement.value = '';
+            }
+            
+            // Form validation and submission
+            const form = document.getElementById('registrationForm');
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Validate that all required fields are selected
+                if (!countrySelect.value) {
+                    showMessage('Please select a country', 'warning');
+                    countrySelect.focus();
+                    return;
+                }
+                
+                if (!stateSelect.value) {
+                    showMessage('Please select a state', 'warning');
+                    stateSelect.focus();
+                    return;
+                }
+                
+                if (!citySelect.value) {
+                    showMessage('Please select a city', 'warning');
+                    citySelect.focus();
+                    return;
+                }
+                
+                // Collect form data
+                const formData = {
+                    userName: document.getElementById('userName').value,
+                    email: document.getElementById('email').value,
+                    phoneNumber: document.getElementById('phoneNumber').value,
+                    countryId: countrySelect.value,
+                    stateId: stateSelect.value,
+                    cityId: citySelect.value
+                };
+                
+                log('Form submission data: ' + JSON.stringify(formData, null, 2));
+                showMessage('Form is ready for submission! (Check console for data)', 'success');
+            });
+        });
+    </script>
+</body>
+</html>

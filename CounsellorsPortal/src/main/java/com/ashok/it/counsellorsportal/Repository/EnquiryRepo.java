@@ -13,6 +13,8 @@ public interface EnquiryRepo extends JpaRepository<Enquiry, Integer> {
     
     List<Enquiry> findByCounsellorId(Integer counsellorId);
     
+    List<Enquiry> findByCounsellorIdAndCourseId(Integer counsellorId, Integer courseId);
+    
     @Query("SELECT e FROM Enquiry e WHERE e.counsellorId = :counsellorId " +
            "AND (:courseId IS NULL OR e.courseId = :courseId) " +
            "AND (:enqStatus IS NULL OR e.enqStatus = :enqStatus) " +

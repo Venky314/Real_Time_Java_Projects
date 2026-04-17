@@ -83,8 +83,17 @@ public class EnquiryController {
             return "redirect:/";
         }
         
+        // Debug logging
+        System.out.println("Filter Parameters:");
+        System.out.println("Counsellor ID from session: " + counsellorId);
+        System.out.println("Course ID: " + filterDto.getCourseId());
+        System.out.println("Enq Status: '" + filterDto.getEnqStatus() + "'");
+        System.out.println("Class Mode: '" + filterDto.getClassMode() + "'");
+        
         List<Enquiry> enquiries = enqService.getEnquiriesWithFilters(filterDto, counsellorId);
         List<Course> courses = courseService.getCourses();
+        
+        System.out.println("Filtered enquiries count: " + enquiries.size());
         
         model.addAttribute("enquiries", enquiries);
         model.addAttribute("courses", courses);
