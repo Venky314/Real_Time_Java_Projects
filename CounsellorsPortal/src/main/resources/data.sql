@@ -1,0 +1,22 @@
+-- Insert sample courses into courses_offering table
+INSERT INTO courses_offering (course_name) VALUES 
+('Java Full Stack'),
+('Python Full Stack'),
+('React JS'),
+('Angular'),
+('Node.js'),
+('Spring Boot'),
+('Hibernate'),
+('JPA'),
+('MySQL'),
+('MongoDB'),
+('AWS'),
+('DevOps'),
+('Docker'),
+('Kubernetes'),
+('Microservices'),
+('REST API'),
+('GraphQL'),
+('HTML/CSS/JavaScript'),
+('TypeScript'),
+('Vue.js');

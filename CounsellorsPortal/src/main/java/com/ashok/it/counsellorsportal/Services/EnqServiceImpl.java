@@ -3,6 +3,8 @@ package com.ashok.it.counsellorsportal.Services;
 import com.ashok.it.counsellorsportal.Model.Enquiry;
 import com.ashok.it.counsellorsportal.Repository.EnquiryRepo;
 import com.ashok.it.counsellorsportal.Dto.EnqFilterRequestDto;
+import com.ashok.it.counsellorsportal.Services.CourseService;
+import com.ashok.it.counsellorsportal.Model.Course;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +16,9 @@ public class EnqServiceImpl implements EnqService {
 
     @Autowired
     private EnquiryRepo enquiryRepo;
+    
+    @Autowired
+    private CourseService courseService;
 
     @Override
     public boolean addEnquiry(Enquiry enq, Integer counsellorId) {
@@ -25,7 +30,15 @@ public class EnqServiceImpl implements EnqService {
 
     @Override
     public List<Enquiry> getAllEnquiries(Integer counsellorId) {
-        return enquiryRepo.findByCounsellorId(counsellorId);
+        List<Enquiry> enquiries = enquiryRepo.findByCounsellorId(counsellorId);
+        // Populate course names
+        for (Enquiry enq : enquiries) {
+            if (enq.getCourseId() != null) {
+                String courseName = getCourseNameById(enq.getCourseId());
+                enq.setCourseName(courseName);
+            }
+        }
+        return enquiries;
     }
 
     @Override
@@ -39,7 +52,15 @@ public class EnqServiceImpl implements EnqService {
             return getAllEnquiries(counsellorId);
         }
         
-        return enquiryRepo.findByFilters(counsellorId, courseId, enqStatus, classMode);
+        List<Enquiry> enquiries = enquiryRepo.findByFilters(counsellorId, courseId, enqStatus, classMode);
+        // Populate course names
+        for (Enquiry enq : enquiries) {
+            if (enq.getCourseId() != null) {
+                String courseName = getCourseNameById(enq.getCourseId());
+                enq.setCourseName(courseName);
+            }
+        }
+        return enquiries;
     }
 
     @Override
@@ -62,5 +83,15 @@ public class EnqServiceImpl implements EnqService {
             return true;
         }
         return false;
+    }
+    
+    private String getCourseNameById(Integer courseId) {
+        List<Course> courses = courseService.getCourses();
+        for (Course course : courses) {
+            if (course.getCourseId().equals(courseId)) {
+                return course.getCourseName();
+            }
+        }
+        return "Unknown Course";
     }
 }

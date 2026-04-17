@@ -31,6 +31,10 @@ public class EnquiryController {
         }
         
         List<Course> courses = courseService.getCourses();
+        System.out.println("Retrieved " + courses.size() + " courses for add-enquiry page");
+        for (Course course : courses) {
+            System.out.println("Course: " + course.getCourseId() + " - " + course.getCourseName());
+        }
         model.addAttribute("courses", courses);
         model.addAttribute("enq", new Enquiry());
         return "add-enq";
