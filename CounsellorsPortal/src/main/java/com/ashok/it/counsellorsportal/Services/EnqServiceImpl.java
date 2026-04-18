@@ -93,6 +93,19 @@ public class EnqServiceImpl implements EnqService {
         }
         return false;
     }
+
+    @Override
+    public boolean deleteEnquiry(Integer enqId) {
+        try {
+            if (enquiryRepo.existsById(enqId)) {
+                enquiryRepo.deleteById(enqId);
+                return true;
+            }
+        } catch (Exception e) {
+            System.err.println("Error deleting enquiry: " + e.getMessage());
+        }
+        return false;
+    }
     
     private String getCourseNameById(Integer courseId) {
         List<Course> courses = courseService.getCourses();

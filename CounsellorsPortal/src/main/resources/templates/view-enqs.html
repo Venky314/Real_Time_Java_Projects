@@ -222,8 +222,25 @@
     <script>
         function deleteEnquiry(enqId) {
             if (confirm('Are you sure you want to delete this enquiry?')) {
-                // Add delete functionality if needed
-                console.log('Delete enquiry:', enqId);
+                fetch(`/delete-enq/${enqId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Enquiry deleted successfully');
+                        location.reload();
+                    } else {
+                        alert('Failed to delete enquiry: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while deleting the enquiry');
+                });
             }
         }
     </script>

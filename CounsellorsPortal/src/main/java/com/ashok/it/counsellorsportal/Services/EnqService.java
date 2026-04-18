@@ -16,4 +16,6 @@ public interface EnqService {
     Enquiry editEnquiry(Integer enqId);
     
     boolean updateEnquiry(Enquiry enquiry);
+    
+    boolean deleteEnquiry(Integer enqId);
 }

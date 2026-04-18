@@ -137,4 +137,26 @@ public class EnquiryController {
         model.addAttribute("courses", courses);
         return "add-enq";
     }
+
+    @DeleteMapping("/delete-enq/{enqId}")
+    @ResponseBody
+    public String deleteEnquiry(@PathVariable Integer enqId, HttpSession session) {
+        Integer counsellorId = (Integer) session.getAttribute("counsellorId");
+        if (counsellorId == null) {
+            return "{\"success\": false, \"message\": \"Session expired\"}";
+        }
+        
+        // Verify the enquiry belongs to the current counsellor
+        Enquiry enquiry = enqService.editEnquiry(enqId);
+        if (enquiry == null || !enquiry.getCounsellorId().equals(counsellorId)) {
+            return "{\"success\": false, \"message\": \"Enquiry not found\"}";
+        }
+        
+        boolean status = enqService.deleteEnquiry(enqId);
+        if (status) {
+            return "{\"success\": true, \"message\": \"Enquiry deleted successfully\"}";
+        } else {
+            return "{\"success\": false, \"message\": \"Failed to delete enquiry\"}";
+        }
+    }
 }
