@@ -89,6 +89,9 @@
                 <i class="bi bi-building"></i> Counsellor Portal
             </a>
             <div class="navbar-nav ms-auto">
+                <a class="nav-link" th:href="@{/edit-profile}">
+                    <i class="bi bi-person-gear"></i> Profile
+                </a>
                 <span class="navbar-text me-3">
                     <i class="bi bi-person-circle"></i> <span th:text="${session.counsellorName}">Counsellor</span>
                 </span>

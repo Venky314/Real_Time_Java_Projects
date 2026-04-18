@@ -53,4 +53,54 @@ public class CounsellorServiceImpl implements CounsellorService {
         
         return dashboard;
     }
+
+    @Override
+    public Counsellor getCounsellorById(Integer counsellorId) {
+        Optional<Counsellor> findById = counsellorRepo.findById(counsellorId);
+        return findById.orElse(null);
+    }
+
+    @Override
+    public boolean updateProfile(Counsellor counsellor, String currentPassword, String newPassword, String confirmPassword) {
+        try {
+            Optional<Counsellor> existingOpt = counsellorRepo.findById(counsellor.getCounsellorId());
+            if (!existingOpt.isPresent()) {
+                return false;
+            }
+            
+            Counsellor existing = existingOpt.get();
+            
+            // If password change is requested
+            if (newPassword != null && !newPassword.trim().isEmpty()) {
+                // Validate current password
+                if (currentPassword == null || currentPassword.trim().isEmpty()) {
+                    return false;
+                }
+                
+                // Verify current password matches
+                if (!existing.getPwd().equals(currentPassword)) {
+                    return false;
+                }
+                
+                // Validate new passwords match
+                if (!newPassword.equals(confirmPassword)) {
+                    return false;
+                }
+                
+                // Update password
+                existing.setPwd(newPassword);
+            }
+            
+            // Update other fields
+            existing.setName(counsellor.getName());
+            existing.setPhno(counsellor.getPhno());
+            
+            counsellorRepo.save(existing);
+            return true;
+            
+        } catch (Exception e) {
+            System.err.println("Error updating profile: " + e.getMessage());
+            return false;
+        }
+    }
 }

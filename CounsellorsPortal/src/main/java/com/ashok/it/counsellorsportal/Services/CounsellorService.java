@@ -10,4 +10,8 @@ public interface CounsellorService {
     Counsellor login(String email, String pwd);
     
     DashboardResponseDto getDashboardInfo(Integer counsellorId);
+    
+    Counsellor getCounsellorById(Integer counsellorId);
+    
+    boolean updateProfile(Counsellor counsellor, String currentPassword, String newPassword, String confirmPassword);
 }
